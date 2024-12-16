@@ -49,6 +49,7 @@ void main() {
         for (int i = 0; i < report.size() - 1; i++) {
             Integer currentNum = report.get(i);
             Integer nextNum = report.get(i + 1);
+            boolean dampenerHitCurNum = false;
 
             if (i == 0) {
                 isIncreasing = currentNum < nextNum;
@@ -59,22 +60,44 @@ void main() {
                 isSafe = currentNum > nextNum && !currentNum.equals(nextNum);
             }
 
-            if (!isSafe && !dampenerHit) {
+            if (!isSafe && i == 0) {
                 dampenerHit = true;
-                isSafe = true;
-            } else if (!isSafe && dampenerHit) {
+                continue;
+            }
+
+            if (!isSafe && !dampenerHit && isIncreasing) {
+                currentNum = report.get(i - 1);
+                isSafe = currentNum < nextNum && !currentNum.equals(nextNum);
+                dampenerHitCurNum = true;
+            } else if (!isSafe && !dampenerHit) {
+                currentNum = report.get(i - 1);
+                isSafe = currentNum > nextNum && !currentNum.equals(nextNum);
+                dampenerHitCurNum = true;
+            }
+
+            if (!isSafe && dampenerHitCurNum) {
                 break;
             }
 
             Integer distance = isIncreasing ? nextNum - currentNum : currentNum - nextNum;
             isSafe = distance <= 3;
 
-            if (!isSafe && !dampenerHit) {
+            if (!isSafe && i == 0) {
                 dampenerHit = true;
-                isSafe = true;
-            } else if (!isSafe && dampenerHit) {
+                continue;
+            }
+
+            if (!isSafe && !dampenerHitCurNum) {
+                distance = isIncreasing ? nextNum - currentNum : currentNum - nextNum;
+                dampenerHitCurNum = true;
+                isSafe = distance <= 3;
+            }
+            
+            if (!isSafe && dampenerHitCurNum) {
                 break;
             }
+
+            dampenerHit = dampenerHitCurNum;
         }
 
         safeReports += isSafe ? 1 : 0;
