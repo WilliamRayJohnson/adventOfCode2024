@@ -80,7 +80,7 @@ void main() {
                 dampenerHitCurNum = true;
             }
 
-            if (!isSafe && dampenerHitCurNum) {
+            if (!isSafe && dampenerHitCurNum || dampenerHit) {
                 break;
             }
 
@@ -99,7 +99,7 @@ void main() {
                 isSafe = distance <= 3;
             }
             
-            if (!isSafe && dampenerHitCurNum) {
+            if (!isSafe && dampenerHitCurNum || dampenerHit) {
                 break;
             }
 
