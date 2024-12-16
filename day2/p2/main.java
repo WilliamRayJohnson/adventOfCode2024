@@ -43,71 +43,54 @@ void main() {
     }
 
     for (List<Integer> report : parsedInputs) {
-        boolean isSafe = true;
-        boolean isIncreasing = false;
-        boolean dampenerHit = false;
-        boolean firstLevelSkipped = false;
-        for (int i = 0; i < report.size() - 1; i++) {
-            Integer currentNum = report.get(i);
-            Integer nextNum = report.get(i + 1);
-            boolean dampenerHitCurNum = false;
+        int calcResult = calcSafeReport(report);
+        boolean isSafe;
 
-            if (i == 0) {
-                isIncreasing = currentNum < nextNum;
-                isSafe = !currentNum.equals(nextNum);
-            } else if (i == 1 && firstLevelSkipped) {
-                isIncreasing = currentNum < nextNum;
-                isSafe = !currentNum.equals(nextNum);
-            } else if (isIncreasing) {
-                isSafe = currentNum < nextNum && !currentNum.equals(nextNum);
-            } else {
-                isSafe = currentNum > nextNum && !currentNum.equals(nextNum);
-            }
-
-            if (!isSafe && i == 0) {
-                dampenerHit = true;
-                firstLevelSkipped = true;
-                continue;
-            }
-
-            if (!isSafe && !dampenerHit && isIncreasing) {
-                currentNum = report.get(i - 1);
-                isSafe = currentNum < nextNum && !currentNum.equals(nextNum);
-                dampenerHitCurNum = true;
-            } else if (!isSafe && !dampenerHit) {
-                currentNum = report.get(i - 1);
-                isSafe = currentNum > nextNum && !currentNum.equals(nextNum);
-                dampenerHitCurNum = true;
-            }
-
-            if (!isSafe && (dampenerHitCurNum || dampenerHit)) {
-                break;
-            }
-
-            Integer distance = isIncreasing ? nextNum - currentNum : currentNum - nextNum;
-            isSafe = distance <= 3;
-
-            if (!isSafe && i == 0) {
-                dampenerHit = true;
-                firstLevelSkipped = true;
-                continue;
-            }
-
-            if (!isSafe && !dampenerHitCurNum) {
-                distance = isIncreasing ? nextNum - currentNum : currentNum - nextNum;
-                dampenerHitCurNum = true;
-                isSafe = distance <= 3;
-            }
-            
-            if (!isSafe && (dampenerHitCurNum || dampenerHit)) {
-                break;
-            }
-
-            dampenerHit = dampenerHitCurNum;
+        if (calcResult >= 0) {
+            List<Integer> repWOCurr = new ArrayList<>(report);
+            repWOCurr.remove(calcResult);
+            List<Integer> repWONext = new ArrayList<>(report);
+            repWONext.remove(calcResult + 1);
+            boolean isCurrSafe = calcSafeReport(repWOCurr) == -1;
+            boolean isNextSafe = calcSafeReport(repWONext) == -1;
+            isSafe = isCurrSafe || isNextSafe;
+        } else {
+            isSafe = true;
         }
 
         safeReports += isSafe ? 1 : 0;
     }
 
     System.out.println("Safe Reports: " + safeReports);
+}
+
+int calcSafeReport(List<Integer> report) {
+    boolean isSafe;
+    boolean isIncreasing = false;
+    for (int i = 0; i < report.size() - 1; i++) {
+        Integer currentNum = report.get(i);
+        Integer nextNum = report.get(i + 1);
+
+        if (i == 0) {
+            isIncreasing = currentNum < nextNum;
+            isSafe = !currentNum.equals(nextNum);
+        } else if (isIncreasing) {
+            isSafe = currentNum < nextNum && !currentNum.equals(nextNum);
+        } else {
+            isSafe = currentNum > nextNum && !currentNum.equals(nextNum);
+        }
+
+        if (!isSafe) {
+            return i;
+        }
+
+        Integer distance = isIncreasing ? nextNum - currentNum : currentNum - nextNum;
+        isSafe = distance <= 3;
+
+        if (!isSafe) {
+            return i;
+        }
+    }
+
+    return -1;
 }
