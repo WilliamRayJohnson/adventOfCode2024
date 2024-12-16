@@ -46,12 +46,16 @@ void main() {
         boolean isSafe = true;
         boolean isIncreasing = false;
         boolean dampenerHit = false;
+        boolean firstLevelSkipped = false;
         for (int i = 0; i < report.size() - 1; i++) {
             Integer currentNum = report.get(i);
             Integer nextNum = report.get(i + 1);
             boolean dampenerHitCurNum = false;
 
             if (i == 0) {
+                isIncreasing = currentNum < nextNum;
+                isSafe = !currentNum.equals(nextNum);
+            } else if (i == 1 && firstLevelSkipped) {
                 isIncreasing = currentNum < nextNum;
                 isSafe = !currentNum.equals(nextNum);
             } else if (isIncreasing) {
@@ -62,6 +66,7 @@ void main() {
 
             if (!isSafe && i == 0) {
                 dampenerHit = true;
+                firstLevelSkipped = true;
                 continue;
             }
 
@@ -84,6 +89,7 @@ void main() {
 
             if (!isSafe && i == 0) {
                 dampenerHit = true;
+                firstLevelSkipped = true;
                 continue;
             }
 
